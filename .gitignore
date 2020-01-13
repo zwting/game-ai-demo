@@ -1,0 +1,12 @@
+.idea/
+.vs/
+Library/
+Logs/
+obj/
+Temp/
+*.sln
+*.csproj
+*.csproj.meta
+*.sln.DotSettings.user
+Assets/Plugins/Editor/Jetbrains/
+Assets/Plugins/Editor/Jetbrains.meta
