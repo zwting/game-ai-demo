@@ -9,6 +9,10 @@ public class Vehicle : MonoBehaviour
     public float MAX_FORCE = 0.1f;
     public float DECELERATE_RADIUS = 10f;
 
+    public bool Seek = false;
+    public bool Arrive = false;
+    public bool Wander = false;
+
     public Vector3 velocity { get; set; }
 
     public Vector3 acceleration { get; set; }
@@ -24,8 +28,20 @@ public class Vehicle : MonoBehaviour
 
     void Start()
     {
-        // _steerList.Add(new SeekSteer());
-        _steerList.Add(new ArriveSteer());
+        if (Seek)
+        {
+            _steerList.Add(new SeekSteer());
+        }
+
+        if (Arrive)
+        {
+            _steerList.Add(new ArriveSteer());
+        }
+
+        if (Wander)
+        {
+            _steerList.Add(new WanderSteer());
+        }
         _heightOffGround = transform.position.y;
     }
 

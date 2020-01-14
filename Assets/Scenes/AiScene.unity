@@ -228,9 +228,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 586629986}
-  MAX_SPEED: 4
-  MAX_FORCE: 0.1
+  MAX_SPEED: 20
+  MAX_FORCE: 1
   DECELERATE_RADIUS: 10
+  Seek: 0
+  Arrive: 0
+  Wander: 1
 --- !u!1 &346266688
 GameObject:
   m_ObjectHideFlags: 0
