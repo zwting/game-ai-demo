@@ -9,13 +9,30 @@ public class Vehicle : MonoBehaviour
     public float MAX_FORCE = 0.1f;
     public float DECELERATE_RADIUS = 10f;
 
+    [SerializeField]
+    private Vehicle targetVehicle;
+
     public bool Seek = false;
     public bool Arrive = false;
     public bool Wander = false;
+    public bool Pursuit = false;
 
     public Vector3 velocity { get; set; }
 
+    public float Speed
+    {
+        get { return velocity.magnitude; }
+    }
+
     public Vector3 acceleration { get; set; }
+
+    /// <summary>
+    /// vehicle目标
+    /// </summary>
+    public Vehicle TargetVehicle
+    {
+        get { return targetVehicle; }
+    }
 
     public Vector3 target { private set; get; }
 
@@ -25,6 +42,7 @@ public class Vehicle : MonoBehaviour
     /// 自身距离地面的高度
     /// </summary>
     private float _heightOffGround = 0.46f;
+
 
     void Start()
     {
@@ -42,6 +60,12 @@ public class Vehicle : MonoBehaviour
         {
             _steerList.Add(new WanderSteer());
         }
+
+        if (Pursuit)
+        {
+            _steerList.Add(new PursuitSteer());
+        }
+
         _heightOffGround = transform.position.y;
     }
 
@@ -69,9 +93,15 @@ public class Vehicle : MonoBehaviour
 
     private void TurnAround()
     {
-        var dir = velocity.normalized;
+        var dir = velocity;
+        if (dir == Vector3.zero)
+        {
+            return;
+        }
+
         dir.y = 0;
-        transform.rotation  = Quaternion.FromToRotation(Vector3.forward, dir);
+        transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+        // transform.rotation  = Quaternion.FromToRotation(Vector3.forward, dir);
     }
 
     private void GetTarget()

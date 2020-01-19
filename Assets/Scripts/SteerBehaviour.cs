@@ -5,6 +5,13 @@ using Random = UnityEngine.Random;
 public abstract class SteerBehaviour
 {
     public abstract Vector3 CalcSteerForce(Vehicle vehicle);
+
+    protected Vector3 Seek(Vehicle vehicle, Vector3 targetPos)
+    {
+        var desired = targetPos - vehicle.transform.position;
+        desired = desired.normalized * vehicle.MAX_SPEED;
+        return Vector3.ClampMagnitude(desired - vehicle.velocity, vehicle.MAX_FORCE); 
+    }
 }
 
 /// <summary>
@@ -14,9 +21,7 @@ public class SeekSteer : SteerBehaviour
 {
     public override Vector3 CalcSteerForce(Vehicle vehicle)
     {
-        Vector3 desired = vehicle.target - vehicle.transform.position;
-        desired = desired.normalized * vehicle.MAX_SPEED;
-        return Vector3.ClampMagnitude(desired - vehicle.velocity, vehicle.MAX_FORCE);
+        return Seek(vehicle, vehicle.target);
     }
 }
 
@@ -88,8 +93,36 @@ public class WanderSteer : SteerBehaviour
 /// </summary>
 public class PursuitSteer : SteerBehaviour
 {
+    /// <summary>
+    /// 面对角度： 在此范围内认为是和目标面对面
+    /// </summary>
+    private float _faceAngle = 20f;
+
+    private float _cosFaceAngle = 0;
+
+    public PursuitSteer()
+    {
+        _cosFaceAngle = Mathf.Cos(_faceAngle * Mathf.Deg2Rad);
+    }
+
     public override Vector3 CalcSteerForce(Vehicle vehicle)
     {
-        return Vector3.zero;
+        var targetVehicle = vehicle.TargetVehicle;
+        if (targetVehicle == null)
+        {
+            return Vector3.zero;
+        }
+
+        var toTarget = targetVehicle.transform.position - vehicle.transform.position;
+
+        //面对面了
+        if (Vector3.Dot(toTarget, vehicle.velocity) > 0
+            && Vector3.Dot(targetVehicle.transform.forward, vehicle.transform.forward) < _cosFaceAngle)
+        {
+            return Seek(vehicle, targetVehicle.transform.position);
+        }
+
+        float lookAheadTime = toTarget.magnitude / (vehicle.Speed + targetVehicle.Speed);
+        return Seek(vehicle, targetVehicle.transform.position + targetVehicle.velocity * lookAheadTime);
     }
 }
